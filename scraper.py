@@ -1,12 +1,18 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+import re
 
 product_id = input("Wpisz kod produkta: ")
+all_opinions = []
+
+file_status = False
+if not isinstance(product_id, int):
+    file_status = True
+    product_id="".join(map(str, re.findall(r"\d", product_id)))
 
 url = "https://www.ceneo.pl/{}#tab=reviews".format(product_id)
-print(product_id)
-all_opinions = []
+
 while (url):
     response = requests.get(url)
     page = BeautifulSoup(response.text, 'html.parser')
@@ -53,5 +59,9 @@ while (url):
     except TypeError:
         url = None
 
-with open("opinions/{}.json".format(product_id), "w", encoding="UTF-8") as jf:
-    json.dump(all_opinions, jf, indent=4, ensure_ascii=False)
+
+if file_status:
+    with open ("opinions/"+product_id+".json", "w", encoding="UTF-8") as jf:
+        json.dump(all_opinions, jf, indent=4, ensure_ascii=False)   
+else:
+    pass
